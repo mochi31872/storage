@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<style>
+    body {
+        margin: 0px;
+        padding: 0px;
+    }
+</style>
+</head>
+<body onload="init()">
+    <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
+    <script>
+
+    var canvas = document.getElementById('myCanvas');
+    var context = canvas.getContext('2d');
+    var lasttime;    
+    var direction = 0;
+
+    var myRectangle = {
+        x: canvas.width * 0.5,
+        y: canvas.height * 0.5,
+        radius: 30,
+        angle: 0,
+        distance: 150,
+        speed: 300
+    };
+
+    var runAnimation = {
+        value: true
+    };
+
+    window.requestAnimFrame = (function(callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+        function(callback) {
+            window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function init(){
+        lasttime = (new Date()).getTime();
+            animate(myRectangle, runAnimation, canvas, context);
+    }
+
+    function drawLine(point, start, contex, style){
+        context.beginPath();
+        context.moveTo(start.x, start.y);
+        context.lineTo(point.x, point.y);
+        context.lineWidth = 5;
+        context.strokeStyle = style;
+        context.stroke();
+    }
+
+    function drawLines(point, canvas, context){
+        var pt1 = {x: 0, y: 0};
+        var pt2 = {x: canvas.width, y: 0};
+        var pt3 = {x: 0, y: canvas.height};
+        var pt4 = {x: canvas.width, y: canvas.height};
+        var pt5 = {x: canvas.width * 0.5, y: canvas.height * 0.5};
+        drawLine(point, pt5, context, 'red');
+        drawLine(point, pt1, context, 'blue');
+        drawLine(point, pt2, context, 'blue');
+        drawLine(point, pt3, context, 'blue');
+        drawLine(point, pt4, context, 'blue');
+    }
+
+    function drawCircle(point, context){
+        context.beginPath();
+        context.arc(point.x, point.y, point.radius, 0, 2 * Math.PI, false);
+        context.fillStyle = 'green';
+        context.fill();
+        context.lineWidth = 5;
+        context.strokeStyle = '#003300';
+        context.stroke();
+    }
+
+    function animate(myRectangle, runAnimation, canvas, context) {
+        if(runAnimation.value) {
+            // update
+            var time = (new Date()).getTime();
+            var timeDiff = time - lasttime;
+            var moveAngle = myRectangle.speed * timeDiff / 1000;
+            myRectangle.angle += moveAngle;
+            if(myRectangle.angle >= 360){
+                myRectangle.angle -= 360;
+            }
+            var radian = myRectangle.angle * Math.PI / 180;
+            myRectangle.x = canvas.width * 0.5 + Math.cos(radian) * myRectangle.distance;
+            myRectangle.y = canvas.height * 0.5 + Math.sin(radian) * myRectangle.distance;
+            
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            //drawRect(myRectangle, context);
+            drawCircle(myRectangle, context);
+            drawLines(myRectangle, canvas, context);
+
+            lasttime = (new Date()).getTime();
+            requestAnimFrame(function() {
+                animate(myRectangle, runAnimation, canvas, context);
+            });
+        }
+    }
+
+    // add click listener to canvas
+    // document.getElementById('myCanvas').addEventListener('click', function() {
+    //     runAnimation.value = !runAnimation.value;
+    //     if(runAnimation.value) {
+    //         lasttime = (new Date()).getTime();
+    //         animate(myRectangle, runAnimation, canvas, context);
+    //     }
+    // });
+
+    //drawRect(myRectangle, context);
+    drawCircle(myRectangle, context);
+    drawLines(myRectangle, canvas, context);
+    </script>
+</body>
+</html>    
